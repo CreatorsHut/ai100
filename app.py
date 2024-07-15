@@ -1,5 +1,4 @@
 import os
-import time
 from openai import OpenAI
 
 import streamlit as st
@@ -10,7 +9,7 @@ client = OpenAI(
     api_key=os.environ.get("OPENAI_API_KEY"),
 )
 
-st.title('슈퍼 시나리오 봇 🤩')
+st.title('홍보 포스터 만들기 🤩')
 
 keyword = st.text_input("키워드를 입력하세요")
 
@@ -24,12 +23,22 @@ if st.button('생성하기'):
                 },
                 {
                     "role": "system",
-                    "content": "입력 받은 키워드에 대한 흥미진진한 100자 이내의 시나리오를 작성해줘",
+                    "content": "입력 받은 키워드에 대한 150자 이내의 솔깃한 제품 홍보 문구를 작성해줘.",
                 }
             ],
             model="gpt-4o",
         )
 
+    response = client.images.generate(
+        model="dall-e-3",
+        prompt=f'{keyword}, 수채화 풍으로 그려줘',
+        size="1024x1024",
+        quality="standard",
+        n=1,
+    )
+
     result = chat_completion.choices[0].message.content
+    image_url = response.data[0].url
 
     st.write(result)
+    st.image(image_url)
